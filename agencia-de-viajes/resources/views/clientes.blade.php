@@ -57,7 +57,7 @@
                                     </div>
                                     <form action="/clientes/{{ $cliente->id }}" method="POST">
                                         @csrf
-                                        @method('PUT')
+                                        @method('put')
                                         <div class="modal-body">
                                             <div class="mb-3">
                                                 <label class="form-label">Nombre</label>

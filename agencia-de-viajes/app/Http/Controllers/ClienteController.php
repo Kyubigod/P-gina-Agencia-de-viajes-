@@ -34,24 +34,26 @@ class ClienteController extends Controller
         return back();
     }
 
-    public function updateCliente(Request $request, Int $id)
-    {
-        $request -> validate ([
-            'nombre'=> 'required|string',
-            'apellido'=> 'required|string',
-            'correo'=> 'required|email|unique:clientes,correo',
-            'telefono'=> 'nullable|string'
-        ]);
+    public function updateCliente(Request $request, $id)
+{
+    $request->validate([
+        'nombre'   => 'required|string',
+        'apellido' => 'required|string',
+        'correo'   => 'required|email|unique:clientes,correo,' . $id,
+        'telefono' => 'nullable|string'
+    ]);
 
-        $request -> update([
-            'nombre' => $request->nombre,
-            'apellido' => $request->apellido,
-            'correo' => $request->correo,
-            'telefono' => $request->telefono
-        ]);
-        
+    $cliente = Cliente::findOrFail($id);
+    
+    $cliente->update([
+        'nombre'   => $request->nombre,
+        'apellido' => $request->apellido,
+        'correo'   => $request->correo,
+        'telefono' => $request->telefono
+    ]);
 
-    }
+    return back();
+}
 
     public function deleteCliente(Request $request, Int $id) {
         $clientes = Cliente::findOrFail($id);
