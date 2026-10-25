@@ -8,3 +8,11 @@ Route::get('/', function () {
 });
 
 Route::get('/clientes', [ClienteController:: class, 'getCliente']);
+
+
+
+Route::post('/clientes', [ClienteController:: class, 'createCliente']);
+
+Route::delete('/clientes/{id}', [ClienteController:: class, 'deleteCliente']);
+
+Route::put('/clientes/{id}', [ClienteController:: class, 'updateCliente']);
