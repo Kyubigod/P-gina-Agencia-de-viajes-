@@ -31,4 +31,3 @@ Route::post('/reservaciones', [ReservacionesController:: class, 'createReservaci
 Route::delete('/reservaciones/{id_reservacion}', [ReservacionesController:: class, 'deleteReservaciones']);
 
 Route::put('/reservaciones/{id_reservacion}', [ReservacionesController:: class, 'updateReservaciones']);
-g
