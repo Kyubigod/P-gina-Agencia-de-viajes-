@@ -5,6 +5,7 @@
             <a class="nav-link" href="/clientes">Clientes</a>
             <a class="nav-link" href="/reservaciones">Reservaciones</a>
             <a class="nav-link" href="/paquetesturisticos">Paquetes Turisticos</a>
+            <a class="nav-link" href="/paquetedestinos">Paquetes de Destinos</a>
             <a class="nav-link" href="/paises">Países</a>
             <a class="nav-link" href="/ciudades">Ciudades</a>
         </div>

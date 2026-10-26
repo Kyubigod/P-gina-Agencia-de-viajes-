@@ -6,6 +6,7 @@ use App\Http\Controllers\PaisController;
 use App\Http\Controllers\CiudadController;
 use App\Http\Controllers\ReservacionesController;
 use App\Http\Controllers\PaquetesTuristicosController;
+use App\Http\Controllers\PaqueteDestinoController;
 
 Route::get('/', function () {
     return view('welcome');
@@ -43,3 +44,7 @@ Route::post('/paquetesturisticos', [PaquetesTuristicosController::class, 'create
 Route::put('/paquetesturisticos/{id_paquete}', [PaquetesTuristicosController::class, 'updatePaquetesTuristicos']);
 
 Route::delete('/paquetesturisticos/{id_paquete}', [PaquetesTuristicosController::class, 'deletePaquetesTuristicos']);
+
+Route::get('/paquetedestinos', [PaqueteDestinoController::class, 'getPaqueteDestinos']);
+Route::post('/paquetedestinos', [PaqueteDestinoController::class, 'createPaqueteDestino']);
+Route::delete('/paquetedestinos/{id_paquete}/{id_ciudad}', [PaqueteDestinoController::class, 'deletePaqueteDestino']);
