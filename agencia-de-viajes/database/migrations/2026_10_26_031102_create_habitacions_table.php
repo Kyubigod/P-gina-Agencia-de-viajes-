@@ -1,0 +1,31 @@
+<?php
+
+use Illuminate\Database\Migrations\Migration;
+use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Support\Facades\Schema;
+
+return new class extends Migration
+{
+    /**
+     * Run the migrations.
+     */
+    public function up(): void
+{
+    Schema::create('habitaciones', function (Blueprint $table) {
+        $table->id();
+        $table->foreignId('hotel_id')->constrained('hoteles')->restrictOnDelete();
+        $table->enum('tipo_habitacion', ['Individual', 'Doble', 'Suite']);
+        $table->decimal('precio_noche', 10, 2);
+        $table->unique(['hotel_id', 'tipo_habitacion']);
+        $table->timestamps();
+    });
+}
+
+    /**
+     * Reverse the migrations.
+     */
+    public function down(): void
+    {
+        Schema::dropIfExists('habitaciones');
+    }
+};
