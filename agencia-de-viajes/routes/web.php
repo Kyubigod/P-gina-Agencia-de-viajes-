@@ -9,6 +9,8 @@ use App\Http\Controllers\PaquetesTuristicosController;
 use App\Http\Controllers\PaqueteDestinoController;
 use App\Http\Controllers\HotelController;
 use App\Http\Controllers\HabitacionController;
+use App\Http\Controllers\TipoTransporteController;
+use App\Http\Controllers\RutaTransporteController;
 
 
 Route::get('/', function () {
@@ -55,3 +57,13 @@ Route::get('/habitaciones', [HabitacionController::class, 'getHabitacion']);
 Route::post('/habitaciones', [HabitacionController::class, 'createHabitacion']);
 Route::delete('/habitaciones/{id}', [HabitacionController::class, 'deleteHabitacion']);
 Route::put('/habitaciones/{id}', [HabitacionController::class, 'updateHabitacion']);
+
+Route::get('/tipos-transporte', [TipoTransporteController::class, 'getTipoTransporte']);
+Route::post('/tipos-transporte', [TipoTransporteController::class, 'createTipoTransporte']);
+Route::delete('/tipos-transporte/{id}', [TipoTransporteController::class, 'deleteTipoTransporte']);
+Route::put('/tipos-transporte/{id}', [TipoTransporteController::class, 'updateTipoTransporte']);
+
+Route::get('/rutas', [RutaTransporteController::class, 'getRutaTransporte']);
+Route::post('/rutas', [RutaTransporteController::class, 'createRutaTransporte']);
+Route::delete('/rutas/{id}', [RutaTransporteController::class, 'deleteRutaTransporte']);
+Route::put('/rutas/{id}', [RutaTransporteController::class, 'updateRutaTransporte']);

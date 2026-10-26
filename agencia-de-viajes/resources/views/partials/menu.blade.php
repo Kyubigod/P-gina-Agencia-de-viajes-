@@ -10,6 +10,8 @@
             <a class="nav-link" href="/ciudades">Ciudades</a>
             <a class="nav-link" href="/hoteles">Hoteles</a>
             <a class="nav-link" href="/habitaciones">Habitaciones</a>
+            <a class="nav-link" href="/tipos-transporte">Tipos de transporte</a>
+            <a class="nav-link" href="/rutas">Rutas</a>
         </div>
     </div>
 </nav>
