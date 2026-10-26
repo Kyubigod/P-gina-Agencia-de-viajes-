@@ -7,6 +7,9 @@ use App\Http\Controllers\CiudadController;
 use App\Http\Controllers\ReservacionesController;
 use App\Http\Controllers\PaquetesTuristicosController;
 use App\Http\Controllers\PaqueteDestinoController;
+use App\Http\Controllers\HotelController;
+use App\Http\Controllers\HabitacionController;
+
 
 Route::get('/', function () {
     return view('welcome');
@@ -30,21 +33,25 @@ Route::delete('/ciudades/{id}', [CiudadController::class, 'deleteCiudad']);
 Route::put('/ciudades/{id}', [CiudadController::class, 'updateCiudad']);
 
 Route::get('/reservaciones', [ReservacionesController:: class, 'getReservaciones']);
-
 Route::post('/reservaciones', [ReservacionesController:: class, 'createReservaciones']);
-
 Route::delete('/reservaciones/{id_reservacion}', [ReservacionesController::class, 'deleteReservaciones']);
-
 Route::put('/reservaciones/{id_reservacion}', [ReservacionesController::class, 'updateReservaciones']);
 
 Route::get('/paquetesturisticos', [PaquetesTuristicosController::class, 'getPaquetesTuristicos']);
-
 Route::post('/paquetesturisticos', [PaquetesTuristicosController::class, 'createPaquetesTuristicos']);
-
 Route::put('/paquetesturisticos/{id_paquete}', [PaquetesTuristicosController::class, 'updatePaquetesTuristicos']);
-
 Route::delete('/paquetesturisticos/{id_paquete}', [PaquetesTuristicosController::class, 'deletePaquetesTuristicos']);
 
 Route::get('/paquetedestinos', [PaqueteDestinoController::class, 'getPaqueteDestinos']);
 Route::post('/paquetedestinos', [PaqueteDestinoController::class, 'createPaqueteDestino']);
 Route::delete('/paquetedestinos/{id_paquete}/{id_ciudad}', [PaqueteDestinoController::class, 'deletePaqueteDestino']);
+
+Route::get('/hoteles', [HotelController::class, 'getHotel']);
+Route::post('/hoteles', [HotelController::class, 'createHotel']);
+Route::delete('/hoteles/{id}', [HotelController::class, 'deleteHotel']);
+Route::put('/hoteles/{id}', [HotelController::class, 'updateHotel']);
+
+Route::get('/habitaciones', [HabitacionController::class, 'getHabitacion']);
+Route::post('/habitaciones', [HabitacionController::class, 'createHabitacion']);
+Route::delete('/habitaciones/{id}', [HabitacionController::class, 'deleteHabitacion']);
+Route::put('/habitaciones/{id}', [HabitacionController::class, 'updateHabitacion']);
