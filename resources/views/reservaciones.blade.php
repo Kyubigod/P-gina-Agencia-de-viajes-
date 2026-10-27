@@ -8,8 +8,11 @@
     <title>Lista de Reservaciones</title>
 </head>
 <body>
-     @include('partials.menu')
+    @include('partials.menu')
+
     <div class="container mt-4">
+        @include('partials.alertas')
+
         <div class="d-flex justify-content-between align-items-center mb-3">
             <h2>Lista de Reservaciones</h2>
             <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#modalCrear">
@@ -34,17 +37,23 @@
                     <td>{{ $reservacion->id_reservacion }}</td>
                     <td>{{ $reservacion->id_cliente }}</td>
                     <td>{{ $reservacion->fecha_reservacion }}</td>
-                    <td>{{ $reservacion->estado }}</td>
+                    <td>
+                        <span class="badge {{ $reservacion->estado == 'confirmada' ? 'bg-success' : ($reservacion->estado == 'cancelada' ? 'bg-danger' : 'bg-warning text-dark') }}">
+                            {{ ucfirst($reservacion->estado) }}
+                        </span>
+                    </td>
                     <td>${{ number_format($reservacion->monto_total, 2) }}</td>
                     <td>
                         <div class="d-flex gap-1">
                             <form action="/reservaciones/{{ $reservacion->id_reservacion }}" method="POST">
                                 @csrf
                                 @method('DELETE')
-                                <button type="submit" class="btn btn-danger btn-sm">Eliminar</button>
+                                <button type="submit" class="btn btn-danger btn-sm" onclick="return confirm('¿Deseas eliminar esta reservación?')" {{ strtolower($reservacion->estado) !== 'pendiente' ? 'disabled' : '' }}>
+                                    Eliminar
+                                </button>
                             </form>
 
-                            <button type="button" class="btn btn-warning btn-sm" data-bs-toggle="modal" data-bs-target="#modalEditar{{ $reservacion->id_reservacion }}">
+                            <button type="button" class="btn btn-warning btn-sm" data-bs-toggle="modal" data-bs-target="#modalEditar{{ $reservacion->id_reservacion }}" {{ strtolower($reservacion->estado) !== 'pendiente' ? 'disabled' : '' }}>
                                 Editar
                             </button>
                         </div>
@@ -61,8 +70,15 @@
                                         @method('PUT')
                                         <div class="modal-body">
                                             <div class="mb-3">
-                                                <label class="form-label">ID Cliente</label>
-                                                <input type="number" name="id_cliente" value="{{ $reservacion->id_cliente }}" class="form-control" required>
+                                                <label class="form-label">Cliente</label>
+                                                <select name="id_cliente" class="form-select" required>
+                                                    <option value="">Selecciona un cliente</option>
+                                                    @foreach($clientes as $cliente)
+                                                        <option value="{{ $cliente->id }}" {{ $reservacion->id_cliente == $cliente->id ? 'selected' : '' }}>
+                                                            {{ $cliente->nombre }} {{ $cliente->apellido ?? '' }} (ID: {{ $cliente->id }})
+                                                        </option>
+                                                    @endforeach
+                                                </select>
                                             </div>
                                             <div class="mb-3">
                                                 <label class="form-label">Fecha Reservación</label>
@@ -107,8 +123,15 @@
                     @csrf
                     <div class="modal-body">
                         <div class="mb-3">
-                            <label class="form-label">ID Cliente</label>
-                            <input type="number" name="id_cliente" class="form-control" required>
+                            <label class="form-label">Cliente</label>
+                            <select name="id_cliente" class="form-select" required>
+                                <option value="">Selecciona un cliente</option>
+                                @foreach($clientes as $cliente)
+                                    <option value="{{ $cliente->id }}">
+                                        {{ $cliente->nombre }} {{ $cliente->apellido ?? '' }} (ID: {{ $cliente->id }})
+                                    </option>
+                                @endforeach
+                            </select>
                         </div>
                         <div class="mb-3">
                             <label class="form-label">Fecha de Reservación</label>
