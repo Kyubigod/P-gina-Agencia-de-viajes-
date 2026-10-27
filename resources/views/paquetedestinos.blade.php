@@ -9,7 +9,10 @@
 </head>
 <body>
     @include('partials.menu')
+
     <div class="container mt-4">
+        @include('partials.alertas')
+
         <div class="d-flex justify-content-between align-items-center mb-3">
             <h2>Asignación de Destinos (Ciudades) a Paquetes</h2>
             <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#modalCrear">
@@ -20,25 +23,40 @@
         <table class="table table-striped table-bordered">
             <thead>
                 <tr>
-                    <th>ID Paquete</th>
-                    <th>ID Ciudad</th>
+                    <th>Paquete Turístico</th>
+                    <th>Ciudad / Destino</th>
                     <th>Acciones</th>
                 </tr>
             </thead>
             <tbody>
-                @foreach($paquetesDestinos as $item)
-                <tr>
-                    <td>{{ $item->id_paquete }}</td>
-                    <td>{{ $item->id_ciudad }}</td>
-                    <td>
-                        <form action="/paquetedestinos/{{ $item->id_paquete }}/{{ $item->id_ciudad }}" method="POST">
-                            @csrf
-                            @method('DELETE')
-                            <button type="submit" class="btn btn-danger btn-sm" onclick="return confirm('¿Deseas desasociar esta ciudad del paquete?')">Eliminar</button>
-                        </form>
-                    </td>
-                </tr>
-                @endforeach
+                @forelse($paquetesDestinos as $item)
+                    @php
+                        $paquete = $paquetes->firstWhere('id_paquete', $item->id_paquete);
+                        $ciudadKey = isset($ciudades->first()->id) ? 'id' : 'id_ciudad';
+                        $ciudad = $ciudades->firstWhere($ciudadKey, $item->id_ciudad);
+                    @endphp
+                    <tr>
+                        <td>
+                            <strong>#{{ $item->id_paquete }}</strong> - {{ $paquete ? $paquete->nombre_paquete : 'N/A' }}
+                        </td>
+                        <td>
+                            <strong>#{{ $item->id_ciudad }}</strong> - {{ $ciudad ? $ciudad->nombre_ciudad : 'N/A' }}
+                        </td>
+                        <td>
+                            <form action="/paquetedestinos/{{ $item->id_paquete }}/{{ $item->id_ciudad }}" method="POST" class="d-inline">
+                                @csrf
+                                @method('DELETE')
+                                <button type="submit" class="btn btn-danger btn-sm" onclick="return confirm('¿Deseas desasociar esta ciudad del paquete?')">
+                                    Eliminar
+                                </button>
+                            </form>
+                        </td>
+                    </tr>
+                @empty
+                    <tr>
+                        <td colspan="3" class="text-center">No hay destinos asignados a paquetes turísticos.</td>
+                    </tr>
+                @endforelse
             </tbody>
         </table>
     </div>
@@ -58,7 +76,9 @@
                             <select name="id_paquete" class="form-select" required>
                                 <option value="">Selecciona un paquete</option>
                                 @foreach($paquetes as $p)
-                                    <option value="{{ $p->id_paquete }}">{{ $p->id_paquete }} - {{ $p->nombre_paquete }}</option>
+                                    <option value="{{ $p->id_paquete }}">
+                                        {{ $p->nombre_paquete }} (ID: {{ $p->id_paquete }})
+                                    </option>
                                 @endforeach
                             </select>
                         </div>
@@ -67,7 +87,10 @@
                             <select name="id_ciudad" class="form-select" required>
                                 <option value="">Selecciona una ciudad</option>
                                 @foreach($ciudades as $c)
-                                    <option value="{{ $c->id ?? $c->id_ciudad }}">{{ $c->id ?? $c->id_ciudad }} - {{ $c->nombre_ciudad }}</option>
+                                    @php $cId = $c->id ?? $c->id_ciudad; @endphp
+                                    <option value="{{ $cId }}">
+                                        {{ $c->nombre_ciudad }} (ID: {{ $cId }})
+                                    </option>
                                 @endforeach
                             </select>
                         </div>

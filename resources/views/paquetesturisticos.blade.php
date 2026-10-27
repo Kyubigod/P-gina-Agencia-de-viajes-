@@ -8,8 +8,11 @@
     <title>Lista de Paquetes Turísticos</title>
 </head>
 <body>
-     @include('partials.menu')
+    @include('partials.menu')
+
     <div class="container mt-4">
+        @include('partials.alertas')
+
         <div class="d-flex justify-content-between align-items-center mb-3">
             <h2>Lista de Paquetes Turísticos</h2>
             <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#modalCrear">
@@ -29,12 +32,12 @@
                 </tr>
             </thead>
             <tbody>
-                @foreach($paquetesturisticos as $paquete)
+                @forelse($paquetesturisticos as $paquete)
                 <tr>
                     <td>{{ $paquete->id_paquete }}</td>
                     <td>{{ $paquete->nombre_paquete }}</td>
                     <td>{{ $paquete->descripcion }}</td>
-                    <td>{{ $paquete->duracion_dias }}</td>
+                    <td>{{ $paquete->duracion_dias }} días</td>
                     <td>${{ number_format($paquete->precio_total, 2) }}</td>
                     <td>
                         <div class="d-flex gap-1">
@@ -62,19 +65,19 @@
                                         <div class="modal-body">
                                             <div class="mb-3">
                                                 <label class="form-label">Nombre del Paquete</label>
-                                                <input type="text" name="nombre_paquete" value="{{ $paquete->nombre_paquete }}" class="form-control" required>
+                                                <input type="text" name="nombre_paquete" value="{{ $paquete->nombre_paquete }}" class="form-control" maxlength="100" required>
                                             </div>
                                             <div class="mb-3">
                                                 <label class="form-label">Descripción</label>
-                                                <textarea name="descripcion" class="form-control" rows="3" required>{{ $paquete->descripcion }}</textarea>
+                                                <textarea name="descripcion" class="form-control" rows="3" maxlength="500" required>{{ $paquete->descripcion }}</textarea>
                                             </div>
                                             <div class="mb-3">
                                                 <label class="form-label">Duración (Días)</label>
-                                                <input type="number" name="duracion_dias" value="{{ $paquete->duracion_dias }}" class="form-control" required>
+                                                <input type="number" name="duracion_dias" value="{{ $paquete->duracion_dias }}" class="form-control" min="1" required>
                                             </div>
                                             <div class="mb-3">
                                                 <label class="form-label">Precio Total</label>
-                                                <input type="number" step="0.01" name="precio_total" value="{{ $paquete->precio_total }}" class="form-control" required>
+                                                <input type="number" step="0.01" min="0.01" name="precio_total" value="{{ $paquete->precio_total }}" class="form-control" required>
                                             </div>
                                         </div>
                                         <div class="modal-footer">
@@ -87,7 +90,11 @@
                         </div>
                     </td>
                 </tr>
-                @endforeach
+                @empty
+                <tr>
+                    <td colspan="6" class="text-center">No hay paquetes turísticos registrados.</td>
+                </tr>
+                @endforelse
             </tbody>
         </table>
     </div>
@@ -104,19 +111,19 @@
                     <div class="modal-body">
                         <div class="mb-3">
                             <label class="form-label">Nombre del Paquete</label>
-                            <input type="text" name="nombre_paquete" class="form-control" required>
+                            <input type="text" name="nombre_paquete" class="form-control" maxlength="100" required>
                         </div>
                         <div class="mb-3">
                             <label class="form-label">Descripción</label>
-                            <textarea name="descripcion" class="form-control" rows="3" required></textarea>
+                            <textarea name="descripcion" class="form-control" rows="3" maxlength="500" required></textarea>
                         </div>
                         <div class="mb-3">
                             <label class="form-label">Duración (Días)</label>
-                            <input type="number" name="duracion_dias" class="form-control" required>
+                            <input type="number" name="duracion_dias" class="form-control" min="1" required>
                         </div>
                         <div class="mb-3">
                             <label class="form-label">Precio Total</label>
-                            <input type="number" step="0.01" name="precio_total" class="form-control" required>
+                            <input type="number" step="0.01" min="0.01" name="precio_total" class="form-control" required>
                         </div>
                     </div>
                     <div class="modal-footer">
