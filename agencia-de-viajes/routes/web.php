@@ -11,7 +11,7 @@ use App\Http\Controllers\HotelController;
 use App\Http\Controllers\HabitacionController;
 use App\Http\Controllers\TipoTransporteController;
 use App\Http\Controllers\RutaTransporteController;
-
+use App\Http\Controllers\PagoController;
 
 Route::get('/', function () {
     return view('welcome');
@@ -67,3 +67,8 @@ Route::get('/rutas', [RutaTransporteController::class, 'getRutaTransporte']);
 Route::post('/rutas', [RutaTransporteController::class, 'createRutaTransporte']);
 Route::delete('/rutas/{id}', [RutaTransporteController::class, 'deleteRutaTransporte']);
 Route::put('/rutas/{id}', [RutaTransporteController::class, 'updateRutaTransporte']);
+
+Route::get('/pagos', [PagoController::class, 'getPago']);
+Route::post('/pagos', [PagoController::class, 'createPago']);
+Route::delete('/pagos/{id}', [PagoController::class, 'deletePago']);
+Route::put('/pagos/{id}', [PagoController::class, 'updatePago']);
