@@ -12,6 +12,7 @@
             <a class="nav-link" href="/habitaciones">Habitaciones</a>
             <a class="nav-link" href="/tipos-transporte">Tipos de transporte</a>
             <a class="nav-link" href="/rutas">Rutas</a>
+            <a class="nav-link" href="/pagos">Pagos</a>
         </div>
     </div>
 </nav>
