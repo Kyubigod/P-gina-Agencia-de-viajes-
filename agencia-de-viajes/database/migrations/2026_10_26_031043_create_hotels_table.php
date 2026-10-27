@@ -16,7 +16,7 @@ return new class extends Migration
         $table->string('nombre_hotel');
         $table->string('direccion');
         $table->unsignedTinyInteger('estrellas');
-        $table->foreignId('ciudad_id')->constrained('ciudades')->restrictOnDelete();
+        $table->foreignId('ciudad_id')->constrained('ciudades');
         $table->unique(['nombre_hotel', 'ciudad_id']);
         $table->timestamps();
     });

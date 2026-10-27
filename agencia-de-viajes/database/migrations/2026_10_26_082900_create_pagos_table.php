@@ -14,8 +14,7 @@ return new class extends Migration
     Schema::create('pagos', function (Blueprint $table) {
         $table->id();
         $table->foreignId('reservacion_id')
-            ->constrained('reservaciones', 'id_reservacion')
-            ->restrictOnDelete();
+            ->constrained('reservaciones', 'id_reservacion');
         $table->enum('metodo_pago', ['Efectivo', 'Tarjeta', 'Transferencia']);
         $table->decimal('monto', 10, 2);
         $table->date('fecha_pago');
