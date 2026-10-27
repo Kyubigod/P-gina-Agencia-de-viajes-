@@ -13,9 +13,9 @@ return new class extends Migration
 {
     Schema::create('rutas_transporte', function (Blueprint $table) {
         $table->id();
-        $table->foreignId('tipo_transporte_id')->constrained('tipos_transporte')->restrictOnDelete();
-        $table->foreignId('ciudad_origen_id')->constrained('ciudades')->restrictOnDelete();
-        $table->foreignId('ciudad_destino_id')->constrained('ciudades')->restrictOnDelete();
+        $table->foreignId('tipo_transporte_id')->constrained('tipos_transporte');
+        $table->foreignId('ciudad_origen_id')->constrained('ciudades');
+        $table->foreignId('ciudad_destino_id')->constrained('ciudades');
         $table->decimal('precio_trayecto', 10, 2);
         $table->dateTime('fecha_salida');
         $table->decimal('duracion_horas', 4, 1);

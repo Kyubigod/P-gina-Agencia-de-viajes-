@@ -13,7 +13,7 @@ return new class extends Migration
 {
     Schema::create('habitaciones', function (Blueprint $table) {
         $table->id();
-        $table->foreignId('hotel_id')->constrained('hoteles')->restrictOnDelete();
+        $table->foreignId('hotel_id')->constrained('hoteles');
         $table->enum('tipo_habitacion', ['Individual', 'Doble', 'Suite']);
         $table->decimal('precio_noche', 10, 2);
         $table->unique(['hotel_id', 'tipo_habitacion']);
