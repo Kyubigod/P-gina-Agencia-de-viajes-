@@ -62,7 +62,7 @@
     <div class="modal fade" id="modalCrear" tabindex="-1" aria-labelledby="modalCrearLabel" aria-hidden="true">
         <div class="modal-dialog">
             <div class="modal-content">
-                <form action="/paquete-hoteles" method="POST">
+                <form action="/paquete-hoteles" method="POST" novalidate>
                     @csrf
                     <div class="modal-header">
                         <h5 class="modal-title" id="modalCrearLabel">Asignar Hotel a Paquete</h5>
@@ -71,21 +71,31 @@
                     <div class="modal-body">
                         <div class="mb-3">
                             <label for="id_paquete" class="form-label">Paquete Turístico</label>
-                            <select name="id_paquete" id="id_paquete" class="form-select" required>
+                            <select name="id_paquete" id="id_paquete" class="form-select @error('id_paquete') is-invalid @enderror">
                                 <option value="">Selecciona un paquete</option>
                                 @foreach($paquetes as $paquete)
-                                    <option value="{{ $paquete->id_paquete }}">{{ $paquete->nombre_paquete }} (ID: {{ $paquete->id_paquete }})</option>
+                                    <option value="{{ $paquete->id_paquete }}" {{ old('id_paquete') == $paquete->id_paquete ? 'selected' : '' }}>
+                                        {{ $paquete->nombre_paquete }} (ID: {{ $paquete->id_paquete }})
+                                    </option>
                                 @endforeach
                             </select>
+                            @error('id_paquete')
+                                <div class="invalid-feedback">{{ $message }}</div>
+                            @enderror
                         </div>
                         <div class="mb-3">
                             <label for="id_hotel" class="form-label">Hotel</label>
-                            <select name="id_hotel" id="id_hotel" class="form-select" required>
+                            <select name="id_hotel" id="id_hotel" class="form-select @error('id_hotel') is-invalid @enderror">
                                 <option value="">Selecciona un hotel</option>
                                 @foreach($hoteles as $hotel)
-                                    <option value="{{ $hotel->id }}">{{ $hotel->nombre_hotel }} (ID: {{ $hotel->id }})</option>
+                                    <option value="{{ $hotel->id }}" {{ old('id_hotel') == $hotel->id ? 'selected' : '' }}>
+                                        {{ $hotel->nombre_hotel }} (ID: {{ $hotel->id }})
+                                    </option>
                                 @endforeach
                             </select>
+                            @error('id_hotel')
+                                <div class="invalid-feedback">{{ $message }}</div>
+                            @enderror
                         </div>
                     </div>
                     <div class="modal-footer">

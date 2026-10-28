@@ -3,75 +3,97 @@
 namespace App\Http\Controllers;
 
 use App\Models\Reservaciones;
-use App\Models\Cliente; 
+use App\Models\Cliente;
 use Illuminate\Http\Request;
 
 class ReservacionesController extends Controller
 {
-    public function getReservaciones() 
+    private array $mensajes = [
+        'id_cliente.required'        => 'Debes seleccionar un cliente.',
+        'id_cliente.exists'          => 'El cliente seleccionado no existe.',
+        'fecha_reservacion.required' => 'La fecha de reservación es obligatoria.',
+        'fecha_reservacion.date'     => 'La fecha de reservación no es válida.',
+        'fecha_reservacion.after_or_equal' => 'La fecha de la reservación no puede ser una fecha pasada.',
+        'estado.in'                  => 'El estado seleccionado no es válido.',
+    ];
+
+    private function reglasCrear(): array
+    {
+        return [
+            'id_cliente'        => ['required', 'integer', 'exists:clientes,id'],
+            'fecha_reservacion' => ['required', 'date', 'after_or_equal:today'],
+        ];
+    }
+
+    private function reglasEditar(): array
+    {
+        return [
+            'id_cliente'        => ['required', 'integer', 'exists:clientes,id'],
+            'fecha_reservacion' => ['required', 'date', 'after_or_equal:today'],
+            'estado'            => ['nullable', 'in:pendiente,cancelada'], // Solo se permite cancelar manualmente
+        ];
+    }
+
+    private function revisarEstado(Reservaciones $reservacion): ?string
+    {
+        if (strtolower($reservacion->estado) !== 'pendiente') {
+            return 'No se puede modificar ni eliminar una reservación que ya está ' . $reservacion->estado . '.';
+        }
+
+        return null;
+    }
+
+    public function getReservaciones()
     {
         $reservaciones = Reservaciones::all();
-        $clientes = Cliente::all(); 
+        $clientes = Cliente::all();
 
         return view('reservaciones', compact('reservaciones', 'clientes'));
     }
 
-    public function createReservaciones(Request $request) 
-{
-    $request->validate([
-        'id_cliente'        => 'required|integer|exists:clientes,id',
-        'fecha_reservacion' => 'required|date|after_or_equal:today', 
-        'estado'            => 'required|in:pendiente,confirmada,cancelada',
-        'monto_total'       => 'required|numeric|min:0'
-    ], [
-        'fecha_reservacion.after_or_equal' => 'La fecha de la reservación no puede ser una fecha pasada.'
-    ]);
+    public function createReservaciones(Request $request)
+    {
+        $datos = $request->validate($this->reglasCrear(), $this->mensajes);
 
-    Reservaciones::create([
-        'id_cliente'        => $request->id_cliente,
-        'fecha_reservacion' => $request->fecha_reservacion,
-        'estado'            => $request->estado,
-        'monto_total'       => $request->monto_total
-    ]);
+        $datos['estado'] = 'pendiente';
+        $datos['monto_total'] = 0.00;
 
-    return back()->with('success', '¡Reservación creada correctamente!');
-}
+        Reservaciones::create($datos);
+
+        return redirect('/reservaciones')->with('ok', 'Reservación creada correctamente.');
+    }
 
     public function updateReservaciones(Request $request, int $id)
     {
         $reservacion = Reservaciones::findOrFail($id);
 
-        if (strtolower($reservacion->estado) !== 'pendiente') {
-            return back()->with('error', 'No se puede modificar una reservación que ya está ' . $reservacion->estado . '.');
+        $error = $this->revisarEstado($reservacion);
+        if ($error) {
+            return back()->with('error', $error)->withInput();
         }
 
-        $request->validate([
-            'id_cliente'        => 'required|integer|exists:clientes,id',
-            'fecha_reservacion' => 'required|date',
-            'estado'            => 'required|in:pendiente,confirmada,cancelada',
-            'monto_total'       => 'required|numeric|min:0'
-        ]);
+        $datos = $request->validate($this->reglasEditar(), $this->mensajes);
 
-        $reservacion->update([
-            'id_cliente'        => $request->id_cliente,
-            'fecha_reservacion' => $request->fecha_reservacion,
-            'estado'            => $request->estado,
-            'monto_total'       => $request->monto_total
-        ]);
+        if (!isset($datos['estado']) || strtolower($datos['estado']) === 'confirmada') {
+            unset($datos['estado']);
+        }
 
-        return back()->with('success', '¡Reservación actualizada correctamente!');
+        $reservacion->update($datos);
+
+        return redirect('/reservaciones')->with('ok', 'Reservación actualizada correctamente.');
     }
 
-    public function deleteReservaciones(Request $request, int $id)
+    public function deleteReservaciones(int $id)
     {
         $reservacion = Reservaciones::findOrFail($id);
 
-        if (strtolower($reservacion->estado) !== 'pendiente') {
-            return back()->with('error', 'No se puede eliminar una reservación que ya está ' . $reservacion->estado . '.');
+        $error = $this->revisarEstado($reservacion);
+        if ($error) {
+            return back()->with('error', $error);
         }
 
         $reservacion->delete();
 
-        return back()->with('success', '¡Reservación eliminada correctamente!');
+        return redirect('/reservaciones')->with('ok', 'Reservación eliminada correctamente.');
     }
 }

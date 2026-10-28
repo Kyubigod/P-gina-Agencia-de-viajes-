@@ -59,25 +59,40 @@
                                         <h5 class="modal-title">Editar Paquete #{{ $paquete->id_paquete }}</h5>
                                         <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                                     </div>
-                                    <form action="/paquetesturisticos/{{ $paquete->id_paquete }}" method="POST">
+                                    <form action="/paquetesturisticos/{{ $paquete->id_paquete }}" method="POST" novalidate>
                                         @csrf
                                         @method('PUT')
                                         <div class="modal-body">
                                             <div class="mb-3">
                                                 <label class="form-label">Nombre del Paquete</label>
-                                                <input type="text" name="nombre_paquete" value="{{ $paquete->nombre_paquete }}" class="form-control" maxlength="100" required>
+                                                <input type="text" name="nombre_paquete" value="{{ old('nombre_paquete', $paquete->nombre_paquete) }}" class="form-control @error('nombre_paquete') is-invalid @enderror" maxlength="100">
+                                                @error('nombre_paquete')
+                                                    <div class="invalid-feedback">{{ $message }}</div>
+                                                @enderror
                                             </div>
                                             <div class="mb-3">
                                                 <label class="form-label">Descripción</label>
-                                                <textarea name="descripcion" class="form-control" rows="3" maxlength="500" required>{{ $paquete->descripcion }}</textarea>
+                                                <textarea name="descripcion" class="form-control @error('descripcion') is-invalid @enderror" rows="3" maxlength="500">{{ old('descripcion', $paquete->descripcion) }}</textarea>
+                                                @error('descripcion')
+                                                    <div class="invalid-feedback">{{ $message }}</div>
+                                                @enderror
                                             </div>
                                             <div class="mb-3">
                                                 <label class="form-label">Duración (Días)</label>
-                                                <input type="number" name="duracion_dias" value="{{ $paquete->duracion_dias }}" class="form-control" min="1" required>
+                                                <input type="number" name="duracion_dias" value="{{ old('duracion_dias', $paquete->duracion_dias) }}" class="form-control @error('duracion_dias') is-invalid @enderror" min="1">
+                                                @error('duracion_dias')
+                                                    <div class="invalid-feedback">{{ $message }}</div>
+                                                @enderror
                                             </div>
                                             <div class="mb-3">
                                                 <label class="form-label">Precio Total</label>
-                                                <input type="number" step="0.01" min="0.01" name="precio_total" value="{{ $paquete->precio_total }}" class="form-control" required>
+                                                <div class="input-group">
+                                                    <span class="input-group-text">$</span>
+                                                    <input type="number" step="0.01" min="0.01" name="precio_total" value="{{ old('precio_total', $paquete->precio_total) }}" class="form-control @error('precio_total') is-invalid @enderror">
+                                                </div>
+                                                @error('precio_total')
+                                                    <div class="invalid-feedback d-block">{{ $message }}</div>
+                                                @enderror
                                             </div>
                                         </div>
                                         <div class="modal-footer">
@@ -106,24 +121,39 @@
                     <h5 class="modal-title">Nuevo Paquete Turístico</h5>
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
-                <form action="/paquetesturisticos" method="POST">
+                <form action="/paquetesturisticos" method="POST" novalidate>
                     @csrf
                     <div class="modal-body">
                         <div class="mb-3">
                             <label class="form-label">Nombre del Paquete</label>
-                            <input type="text" name="nombre_paquete" class="form-control" maxlength="100" required>
+                            <input type="text" name="nombre_paquete" value="{{ old('nombre_paquete') }}" class="form-control @error('nombre_paquete') is-invalid @enderror" maxlength="100">
+                            @error('nombre_paquete')
+                                <div class="invalid-feedback">{{ $message }}</div>
+                            @enderror
                         </div>
                         <div class="mb-3">
                             <label class="form-label">Descripción</label>
-                            <textarea name="descripcion" class="form-control" rows="3" maxlength="500" required></textarea>
+                            <textarea name="descripcion" class="form-control @error('descripcion') is-invalid @enderror" rows="3" maxlength="500">{{ old('descripcion') }}</textarea>
+                            @error('descripcion')
+                                <div class="invalid-feedback">{{ $message }}</div>
+                            @enderror
                         </div>
                         <div class="mb-3">
                             <label class="form-label">Duración (Días)</label>
-                            <input type="number" name="duracion_dias" class="form-control" min="1" required>
+                            <input type="number" name="duracion_dias" value="{{ old('duracion_dias') }}" class="form-control @error('duracion_dias') is-invalid @enderror" min="1">
+                            @error('duracion_dias')
+                                <div class="invalid-feedback">{{ $message }}</div>
+                            @enderror
                         </div>
                         <div class="mb-3">
                             <label class="form-label">Precio Total</label>
-                            <input type="number" step="0.01" min="0.01" name="precio_total" class="form-control" required>
+                            <div class="input-group">
+                                <span class="input-group-text">$</span>
+                                <input type="number" step="0.01" min="0.01" name="precio_total" value="{{ old('precio_total') }}" class="form-control @error('precio_total') is-invalid @enderror">
+                            </div>
+                            @error('precio_total')
+                                <div class="invalid-feedback d-block">{{ $message }}</div>
+                            @enderror
                         </div>
                     </div>
                     <div class="modal-footer">

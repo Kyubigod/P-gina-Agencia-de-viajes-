@@ -81,8 +81,7 @@ Route::get('/paquete-hoteles', [PaqueteHotelesController::class, 'getPaqueteHote
 Route::post('/paquete-hoteles', [PaqueteHotelesController::class, 'createPaqueteHotel']);
 Route::delete('/paquete-hoteles/{id_paquete}/{id_hotel}', [PaqueteHotelesController::class, 'deletePaqueteHotel']);
 
-// Detalles Reservación
 Route::get('/detallesreservacion', [DetallesReservacionController::class, 'getDetalleReservacion']);
-Route::post('/detallesreservacion', [DetallesReservacionController::class, 'createDetalleReservacion']);
+Route::post('/detallesreservacion', [DetallesReservacionController::class, 'createDetalleReservacion']); 
 Route::put('/detallesreservacion/{id}', [DetallesReservacionController::class, 'updateDetalleReservacion']);
 Route::delete('/detallesreservacion/{id}', [DetallesReservacionController::class, 'deleteDetalleReservacion']);

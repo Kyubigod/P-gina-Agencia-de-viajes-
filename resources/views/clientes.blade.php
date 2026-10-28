@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="es">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -8,8 +8,11 @@
     <title>Clientes</title>
 </head>
 <body>
-@include('partials.menu')
+    @include('partials.menu')
+
     <div class="container mt-4">
+        @include('partials.alertas')
+
         <div class="d-flex justify-content-between align-items-center mb-3">
             <h2>Lista de Clientes</h2>
             <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#modalCrear">
@@ -24,24 +27,26 @@
                     <th>Nombre</th>
                     <th>Apellido</th>
                     <th>Correo</th>
-                    <th>Telefono</th>
+                    <th>Teléfono</th>
                     <th>Acciones</th>
                 </tr>
             </thead>
             <tbody>
-                @foreach($clientes as $cliente)
+                @forelse($clientes as $cliente)
                 <tr>
                     <td>{{ $cliente->id }}</td>
                     <td>{{ $cliente->nombre }}</td>
                     <td>{{ $cliente->apellido }}</td>
                     <td>{{ $cliente->correo }}</td>
-                    <td>{{ $cliente->telefono }}</td>
+                    <td>{{ $cliente->telefono ?? 'N/A' }}</td>
                     <td>
                         <div class="d-flex gap-1">
                             <form action="/clientes/{{ $cliente->id }}" method="POST">
                                 @csrf
                                 @method('DELETE')
-                                <button type="submit" class="btn btn-danger btn-sm">Eliminar</button>
+                                <button type="submit" class="btn btn-danger btn-sm" onclick="return confirm('¿Deseas eliminar este cliente?')">
+                                    Eliminar
+                                </button>
                             </form>
 
                             <button type="button" class="btn btn-warning btn-sm" data-bs-toggle="modal" data-bs-target="#modalEditar{{ $cliente->id }}">
@@ -56,25 +61,37 @@
                                         <h5 class="modal-title">Editar Cliente #{{ $cliente->id }}</h5>
                                         <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                                     </div>
-                                    <form action="/clientes/{{ $cliente->id }}" method="POST">
+                                    <form action="/clientes/{{ $cliente->id }}" method="POST" novalidate>
                                         @csrf
-                                        @method('put')
+                                        @method('PUT')
                                         <div class="modal-body">
                                             <div class="mb-3">
                                                 <label class="form-label">Nombre</label>
-                                                <input type="text" name="nombre" value="{{ $cliente->nombre }}" class="form-control" required>
+                                                <input type="text" name="nombre" value="{{ old('nombre', $cliente->nombre) }}" class="form-control @error('nombre') is-invalid @enderror" maxlength="100">
+                                                @error('nombre')
+                                                    <div class="invalid-feedback">{{ $message }}</div>
+                                                @enderror
                                             </div>
                                             <div class="mb-3">
                                                 <label class="form-label">Apellido</label>
-                                                <input type="text" name="apellido" value="{{ $cliente->apellido }}" class="form-control" required>
+                                                <input type="text" name="apellido" value="{{ old('apellido', $cliente->apellido) }}" class="form-control @error('apellido') is-invalid @enderror" maxlength="100">
+                                                @error('apellido')
+                                                    <div class="invalid-feedback">{{ $message }}</div>
+                                                @enderror
                                             </div>
                                             <div class="mb-3">
                                                 <label class="form-label">Correo</label>
-                                                <input type="email" name="correo" value="{{ $cliente->correo }}" class="form-control" required>
+                                                <input type="email" name="correo" value="{{ old('correo', $cliente->correo) }}" class="form-control @error('correo') is-invalid @enderror">
+                                                @error('correo')
+                                                    <div class="invalid-feedback">{{ $message }}</div>
+                                                @enderror
                                             </div>
                                             <div class="mb-3">
                                                 <label class="form-label">Teléfono</label>
-                                                <input type="text" name="telefono" value="{{ $cliente->telefono }}" class="form-control">
+                                                <input type="text" name="telefono" value="{{ old('telefono', $cliente->telefono) }}" class="form-control @error('telefono') is-invalid @enderror" maxlength="20">
+                                                @error('telefono')
+                                                    <div class="invalid-feedback">{{ $message }}</div>
+                                                @enderror
                                             </div>
                                         </div>
                                         <div class="modal-footer">
@@ -86,8 +103,12 @@
                             </div>
                         </div>
                     </td>
-                </tr>                
-                @endforeach
+                </tr>
+                @empty
+                <tr>
+                    <td colspan="6" class="text-center">No hay clientes registrados.</td>
+                </tr>
+                @endforelse
             </tbody>
         </table>
     </div>
@@ -99,24 +120,36 @@
                     <h5 class="modal-title">Nuevo Cliente</h5>
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
-                <form action="/clientes" method="POST">
+                <form action="/clientes" method="POST" novalidate>
                     @csrf
                     <div class="modal-body">
                         <div class="mb-3">
                             <label class="form-label">Nombre</label>
-                            <input type="text" name="nombre" class="form-control" required>
+                            <input type="text" name="nombre" value="{{ old('nombre') }}" class="form-control @error('nombre') is-invalid @enderror" maxlength="100">
+                            @error('nombre')
+                                <div class="invalid-feedback">{{ $message }}</div>
+                            @enderror
                         </div>
                         <div class="mb-3">
                             <label class="form-label">Apellido</label>
-                            <input type="text" name="apellido" class="form-control" required>
+                            <input type="text" name="apellido" value="{{ old('apellido') }}" class="form-control @error('apellido') is-invalid @enderror" maxlength="100">
+                            @error('apellido')
+                                <div class="invalid-feedback">{{ $message }}</div>
+                            @enderror
                         </div>
                         <div class="mb-3">
                             <label class="form-label">Correo</label>
-                            <input type="email" name="correo" class="form-control" required>
+                            <input type="email" name="correo" value="{{ old('correo') }}" class="form-control @error('correo') is-invalid @enderror">
+                            @error('correo')
+                                <div class="invalid-feedback">{{ $message }}</div>
+                            @enderror
                         </div>
                         <div class="mb-3">
                             <label class="form-label">Teléfono</label>
-                            <input type="text" name="telefono" class="form-control">
+                            <input type="text" name="telefono" value="{{ old('telefono') }}" class="form-control @error('telefono') is-invalid @enderror" maxlength="20">
+                            @error('telefono')
+                                <div class="invalid-feedback">{{ $message }}</div>
+                            @enderror
                         </div>
                     </div>
                     <div class="modal-footer">

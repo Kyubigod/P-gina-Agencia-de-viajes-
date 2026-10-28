@@ -19,7 +19,7 @@
             </button>
         </div>
 
-        <table class="table table-striped table-bordered">
+        <table class="table table-striped table-bordered align-middle">
             <thead>
                 <tr>
                     <th>ID</th>
@@ -27,81 +27,113 @@
                     <th>Método</th>
                     <th>Monto</th>
                     <th>Fecha</th>
-                    <th>Acciones</th>
+                    <th class="text-center" style="width: 150px;">Acciones</th>
                 </tr>
             </thead>
             <tbody>
                 @forelse($pagos as $pago)
+                @php
+                    $esConfirmada = strtolower($pago->reservacion->estado ?? '') === 'confirmada';
+                @endphp
                 <tr>
                     <td>{{ $pago->id }}</td>
-                    <td>#{{ $pago->reservacion_id }} ({{ ucfirst($pago->reservacion->estado) }})</td>
+                    <td>
+                        <strong>#{{ $pago->reservacion_id }}</strong> 
+                        @if($pago->reservacion)
+                            <span class="badge {{ $esConfirmada ? 'bg-success' : 'bg-warning text-dark' }}">
+                                {{ ucfirst($pago->reservacion->estado) }}
+                            </span>
+                            <small class="text-muted d-block">Total: ${{ number_format($pago->reservacion->monto_total, 2) }}</small>
+                        @endif
+                    </td>
                     <td>{{ $pago->metodo_pago }}</td>
                     <td>${{ number_format($pago->monto, 2) }}</td>
-                    <td>{{ $pago->fecha_pago->format('d/m/Y') }}</td>
-                    <td>
-                        <div class="d-flex gap-1">
-                            <form action="/pagos/{{ $pago->id }}" method="POST"
-                                  onsubmit="return confirm('¿Eliminar este pago?')">
-                                @csrf
-                                @method('DELETE')
-                                <button type="submit" class="btn btn-danger btn-sm">Eliminar</button>
-                            </form>
+                    <td>{{ \Carbon\Carbon::parse($pago->fecha_pago)->format('d/m/Y') }}</td>
+                    <td class="text-center">
+                        @if(!$esConfirmada)
+                            <div class="d-flex justify-content-center gap-1">
+                                <form action="/pagos/{{ $pago->id }}" method="POST" onsubmit="return confirm('¿Eliminar este pago?')">
+                                    @csrf
+                                    @method('DELETE')
+                                    <button type="submit" class="btn btn-danger btn-sm">Eliminar</button>
+                                </form>
 
-                            <button type="button" class="btn btn-warning btn-sm" data-bs-toggle="modal" data-bs-target="#modalEditar{{ $pago->id }}">
-                                Editar
-                            </button>
-                        </div>
+                                <button type="button" class="btn btn-warning btn-sm" data-bs-toggle="modal" data-bs-target="#modalEditar{{ $pago->id }}">
+                                    Editar
+                                </button>
+                            </div>
 
-                        <div class="modal fade" id="modalEditar{{ $pago->id }}" tabindex="-1" aria-hidden="true">
-                            <div class="modal-dialog">
-                                <div class="modal-content">
-                                    <div class="modal-header">
-                                        <h5 class="modal-title">Editar Pago #{{ $pago->id }}</h5>
-                                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                            <div class="modal fade text-start" id="modalEditar{{ $pago->id }}" tabindex="-1" aria-hidden="true">
+                                <div class="modal-dialog">
+                                    <div class="modal-content">
+                                        <div class="modal-header">
+                                            <h5 class="modal-title">Editar Pago #{{ $pago->id }}</h5>
+                                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                        </div>
+                                        <form action="/pagos/{{ $pago->id }}" method="POST" novalidate>
+                                            @csrf
+                                            @method('PUT')
+                                            <div class="modal-body">
+                                                <div class="mb-3">
+                                                    <label class="form-label">Reservación</label>
+                                                    <select name="reservacion_id" class="form-select @error('reservacion_id') is-invalid @enderror">
+                                                        @foreach($reservaciones as $r)
+                                                            @php
+                                                                $restante = round($r->saldo_pendiente ?? ($r->monto_total - $r->pagos->sum('monto')), 2);
+                                                            @endphp
+                                                            <option value="{{ $r->id_reservacion }}" {{ old('reservacion_id', $pago->reservacion_id) == $r->id_reservacion ? 'selected' : '' }}>
+                                                                Reservación #{{ $r->id_reservacion }} - Restante: ${{ number_format($restante, 2) }} (Total: ${{ number_format($r->monto_total, 2) }})
+                                                            </option>
+                                                        @endforeach
+                                                    </select>
+                                                    @error('reservacion_id')
+                                                        <div class="invalid-feedback">{{ $message }}</div>
+                                                    @enderror
+                                                </div>
+                                                <div class="mb-3">
+                                                    <label class="form-label">Método de pago</label>
+                                                    <select name="metodo_pago" class="form-select @error('metodo_pago') is-invalid @enderror">
+                                                        @foreach(['Efectivo', 'Tarjeta', 'Transferencia'] as $m)
+                                                            <option value="{{ $m }}" {{ old('metodo_pago', $pago->metodo_pago) == $m ? 'selected' : '' }}>{{ $m }}</option>
+                                                        @endforeach
+                                                    </select>
+                                                    @error('metodo_pago')
+                                                        <div class="invalid-feedback">{{ $message }}</div>
+                                                    @enderror
+                                                </div>
+                                                <div class="mb-3">
+                                                    <label class="form-label">Monto</label>
+                                                    <div class="input-group">
+                                                        <span class="input-group-text">$</span>
+                                                        <input type="number" name="monto" value="{{ old('monto', $pago->monto) }}" class="form-control @error('monto') is-invalid @enderror" step="0.01" min="0.01">
+                                                    </div>
+                                                    @error('monto')
+                                                        <div class="invalid-feedback d-block">{{ $message }}</div>
+                                                    @enderror
+                                                </div>
+                                                <div class="mb-3">
+                                                    <label class="form-label">Fecha de pago</label>
+                                                    <input type="date" name="fecha_pago" value="{{ old('fecha_pago', \Carbon\Carbon::parse($pago->fecha_pago)->format('Y-m-d')) }}" max="{{ date('Y-m-d') }}" class="form-control @error('fecha_pago') is-invalid @enderror">
+                                                    @error('fecha_pago')
+                                                        <div class="invalid-feedback">{{ $message }}</div>
+                                                    @enderror
+                                                </div>
+                                            </div>
+                                            <div class="modal-footer">
+                                                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                                                <button type="submit" class="btn btn-primary">Actualizar</button>
+                                            </div>
+                                        </form>
                                     </div>
-                                    <form action="/pagos/{{ $pago->id }}" method="POST">
-                                        @csrf
-                                        @method('PUT')
-                                        <div class="modal-body">
-                                            <div class="mb-3">
-                                                <label class="form-label">Reservación</label>
-                                                <select name="reservacion_id" class="form-select" required>
-                                                    @foreach($reservaciones as $r)
-                                                        <option value="{{ $r->id_reservacion }}" @selected($pago->reservacion_id == $r->id_reservacion)>
-                                                            #{{ $r->id_reservacion }} - Total ${{ number_format($r->monto_total, 2) }}
-                                                        </option>
-                                                    @endforeach
-                                                </select>
-                                            </div>
-                                            <div class="mb-3">
-                                                <label class="form-label">Método de pago</label>
-                                                <select name="metodo_pago" class="form-select" required>
-                                                    @foreach(['Efectivo', 'Tarjeta', 'Transferencia'] as $m)
-                                                        <option value="{{ $m }}" @selected($pago->metodo_pago == $m)>{{ $m }}</option>
-                                                    @endforeach
-                                                </select>
-                                            </div>
-                                            <div class="mb-3">
-                                                <label class="form-label">Monto</label>
-                                                <input type="number" name="monto" value="{{ $pago->monto }}" class="form-control" step="0.01" min="0.01" required>
-                                            </div>
-                                            <div class="mb-3">
-                                                <label class="form-label">Fecha de pago</label>
-                                                <input type="date" name="fecha_pago" value="{{ $pago->fecha_pago->format('Y-m-d') }}" max="{{ date('Y-m-d') }}" class="form-control" required>
-                                            </div>
-                                        </div>
-                                        <div class="modal-footer">
-                                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
-                                            <button type="submit" class="btn btn-primary">Actualizar</button>
-                                        </div>
-                                    </form>
                                 </div>
                             </div>
-                        </div>
+                        @endif
                     </td>
                 </tr>
                 @empty
-                <tr><td colspan="6" class="text-center">No hay pagos registrados.</td></tr>
+                <tr>
+                    <td colspan="6" class="text-center">No hay pagos registrados.</td>
+                </tr>
                 @endforelse
             </tbody>
         </table>
@@ -114,36 +146,54 @@
                     <h5 class="modal-title">Registrar Pago</h5>
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
-                <form action="/pagos" method="POST">
+                <form action="/pagos" method="POST" novalidate>
                     @csrf
                     <div class="modal-body">
                         <div class="mb-3">
-                            <label class="form-label">Reservación</label>
-                            <select name="reservacion_id" class="form-select" required>
-                                <option value="">-- Selecciona --</option>
+                            <label class="form-label">Reservación Pendiente</label>
+                            <select name="reservacion_id" class="form-select @error('reservacion_id') is-invalid @enderror">
+                                <option value="">-- Selecciona una reservación --</option>
                                 @foreach($reservaciones as $r)
-                                    <option value="{{ $r->id_reservacion }}">
-                                        #{{ $r->id_reservacion }} - Total ${{ number_format($r->monto_total, 2) }}
+                                    @php
+                                        $restante = round($r->saldo_pendiente ?? ($r->monto_total - $r->pagos->sum('monto')), 2);
+                                    @endphp
+                                    <option value="{{ $r->id_reservacion }}" {{ old('reservacion_id') == $r->id_reservacion ? 'selected' : '' }}>
+                                        Reservación #{{ $r->id_reservacion }} - Restante: ${{ number_format($restante, 2) }} (Total: ${{ number_format($r->monto_total, 2) }})
                                     </option>
                                 @endforeach
                             </select>
+                            @error('reservacion_id')
+                                <div class="invalid-feedback">{{ $message }}</div>
+                            @enderror
                         </div>
                         <div class="mb-3">
                             <label class="form-label">Método de pago</label>
-                            <select name="metodo_pago" class="form-select" required>
+                            <select name="metodo_pago" class="form-select @error('metodo_pago') is-invalid @enderror">
                                 <option value="">-- Selecciona --</option>
-                                <option value="Efectivo">Efectivo</option>
-                                <option value="Tarjeta">Tarjeta</option>
-                                <option value="Transferencia">Transferencia</option>
+                                <option value="Efectivo" {{ old('metodo_pago') == 'Efectivo' ? 'selected' : '' }}>Efectivo</option>
+                                <option value="Tarjeta" {{ old('metodo_pago') == 'Tarjeta' ? 'selected' : '' }}>Tarjeta</option>
+                                <option value="Transferencia" {{ old('metodo_pago') == 'Transferencia' ? 'selected' : '' }}>Transferencia</option>
                             </select>
+                            @error('metodo_pago')
+                                <div class="invalid-feedback">{{ $message }}</div>
+                            @enderror
                         </div>
                         <div class="mb-3">
                             <label class="form-label">Monto</label>
-                            <input type="number" name="monto" class="form-control" step="0.01" min="0.01" required>
+                            <div class="input-group">
+                                <span class="input-group-text">$</span>
+                                <input type="number" name="monto" value="{{ old('monto') }}" class="form-control @error('monto') is-invalid @enderror" step="0.01" min="0.01">
+                            </div>
+                            @error('monto')
+                                <div class="invalid-feedback d-block">{{ $message }}</div>
+                            @enderror
                         </div>
                         <div class="mb-3">
                             <label class="form-label">Fecha de pago</label>
-                            <input type="date" name="fecha_pago" value="{{ date('Y-m-d') }}" max="{{ date('Y-m-d') }}" class="form-control" required>
+                            <input type="date" name="fecha_pago" value="{{ old('fecha_pago', date('Y-m-d')) }}" max="{{ date('Y-m-d') }}" class="form-control @error('fecha_pago') is-invalid @enderror">
+                            @error('fecha_pago')
+                                <div class="invalid-feedback">{{ $message }}</div>
+                            @enderror
                         </div>
                     </div>
                     <div class="modal-footer">
@@ -154,6 +204,7 @@
             </div>
         </div>
     </div>
+
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>

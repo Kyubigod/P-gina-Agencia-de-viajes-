@@ -68,31 +68,37 @@
                     <h5 class="modal-title">Asignar Destino a Paquete</h5>
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
-                <form action="/paquetedestinos" method="POST">
+                <form action="/paquetedestinos" method="POST" novalidate>
                     @csrf
                     <div class="modal-body">
                         <div class="mb-3">
                             <label class="form-label">Paquete Turístico</label>
-                            <select name="id_paquete" class="form-select" required>
+                            <select name="id_paquete" class="form-select @error('id_paquete') is-invalid @enderror">
                                 <option value="">Selecciona un paquete</option>
                                 @foreach($paquetes as $p)
-                                    <option value="{{ $p->id_paquete }}">
+                                    <option value="{{ $p->id_paquete }}" {{ old('id_paquete') == $p->id_paquete ? 'selected' : '' }}>
                                         {{ $p->nombre_paquete }} (ID: {{ $p->id_paquete }})
                                     </option>
                                 @endforeach
                             </select>
+                            @error('id_paquete')
+                                <div class="invalid-feedback">{{ $message }}</div>
+                            @enderror
                         </div>
                         <div class="mb-3">
                             <label class="form-label">Ciudad / Destino</label>
-                            <select name="id_ciudad" class="form-select" required>
+                            <select name="id_ciudad" class="form-select @error('id_ciudad') is-invalid @enderror">
                                 <option value="">Selecciona una ciudad</option>
                                 @foreach($ciudades as $c)
                                     @php $cId = $c->id ?? $c->id_ciudad; @endphp
-                                    <option value="{{ $cId }}">
+                                    <option value="{{ $cId }}" {{ old('id_ciudad') == $cId ? 'selected' : '' }}>
                                         {{ $c->nombre_ciudad }} (ID: {{ $cId }})
                                     </option>
                                 @endforeach
                             </select>
+                            @error('id_ciudad')
+                                <div class="invalid-feedback">{{ $message }}</div>
+                            @enderror
                         </div>
                     </div>
                     <div class="modal-footer">
