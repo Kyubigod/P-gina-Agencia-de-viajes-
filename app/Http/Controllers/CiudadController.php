@@ -31,7 +31,7 @@ class CiudadController extends Controller
         'pais_id.required'       => 'Debes seleccionar un país.',
         'pais_id.exists'         => 'El país seleccionado no es válido.',
     ];
-
+     
     public function getCiudad()
     {
         $ciudades = Ciudad::with('pais')->orderBy('nombre_ciudad')->get();
