@@ -12,23 +12,26 @@ class ClienteController extends Controller
         'nombre.required'   => 'El nombre del cliente es obligatorio.',
         'nombre.string'     => 'El nombre debe ser un texto válido.',
         'nombre.max'        => 'El nombre no puede exceder los 100 caracteres.',
+        'nombre.regex'      => 'El nombre solo puede contener letras y espacios, sin números ni símbolos.',
         'apellido.required' => 'El apellido es obligatorio.',
         'apellido.string'   => 'El apellido debe ser un texto válido.',
         'apellido.max'      => 'El apellido no puede exceder los 100 caracteres.',
+        'apellido.regex'    => 'El apellido solo puede contener letras y espacios, sin números ni símbolos.',
         'correo.required'   => 'El correo electrónico es obligatorio.',
         'correo.email'      => 'Ingresa un correo electrónico válido.',
         'correo.unique'     => 'Este correo electrónico ya está registrado por otro cliente.',
-        'telefono.string'   => 'El teléfono debe ser un formato de texto válido.',
-        'telefono.max'      => 'El teléfono no puede exceder los 20 caracteres.',
+        'correo.regex'      => 'El correo electrónico debe ser de dominio @gmail.com.',
+        'telefono.required' => 'El teléfono es obligatorio.',
+        'telefono.regex'    => 'El teléfono debe contener exactamente 10 dígitos numéricos.',
     ];
 
     private function reglas(?int $id = null): array
     {
         return [
-            'nombre'   => ['required', 'string', 'max:100'],
-            'apellido' => ['required', 'string', 'max:100'],
-            'correo'   => ['required', 'email', 'unique:clientes,correo' . ($id ? ',' . $id : '')],
-            'telefono' => ['nullable', 'string', 'max:20'],
+            'nombre'   => ['required', 'string', 'max:100', 'regex:/^[a-zA-ZáéíóúÁÉÍÓÚñÑ\s]+$/'],
+            'apellido' => ['required', 'string', 'max:100', 'regex:/^[a-zA-ZáéíóúÁÉÍÓÚñÑ\s]+$/'],
+            'correo'   => ['required', 'email', 'unique:clientes,correo' . ($id ? ',' . $id : ''), 'regex:/^[a-zA-Z0-9._%+-]+@gmail\.com$/i'],
+            'telefono' => ['required', 'regex:/^[0-9]{10}$/'],
         ];
     }
 
@@ -82,4 +85,4 @@ class ClienteController extends Controller
 
         return back()->with('success', '¡Cliente eliminado correctamente!');
     }
-}
+}   
